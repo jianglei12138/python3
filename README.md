@@ -22,214 +22,59 @@
 
 - 我使用的是ubuntu15.10 64位操作系统。
 
-#### 2.编译过程
+- 由于bionic不支持localeconv(), 可以使用我仓库里的liblocale库。
 
-- ```shell
-  ./configure  --build=x86_64-linux-gnu --host=arm-linux-androideabi --disable-ipv6 CONFIG_SITE=config.site --prefix=/system/
+- Android struct passwd不包含pw_gecos, 修改Module/pwdmodule.c中的
+
+  ```c
+  SETS(setIndex++, p->pw_gecos);
   ```
 
-On Unix, Linux, BSD, OSX, and Cygwin:
+  改为
 
-    ./configure
-    make
-    make test
-    sudo make install
+  ```c
+  SETS(setIndex++, p->pw_name);
+  ```
 
-This will install Python as python3.
+#### 2.编译过程
 
-You can pass many options to the configure script; run "./configure --help" to
-find out more.  On OSX and Cygwin, the executable is called python.exe;
-elsewhere it's just python.
+编译需要分别编译pc版与android版，因为需要pc版的生成的语法解析器pgen与_freeze_importlib
 
-On Mac OS X, if you have configured Python with --enable-framework, you should
-use "make frameworkinstall" to do the installation.  Note that this installs
-the Python executable in a place that is not normally on your PATH, you may
-want to set up a symlink in /usr/local/bin.
+- pc版编译
 
-On Windows, see PCbuild/readme.txt.
+  ```shell
+  ./configure && make
+  ```
 
-If you wish, you can create a subdirectory and invoke configure from there.
-For example:
+- android版编译
 
-    mkdir debug
-    cd debug
-    ../configure --with-pydebug
-    make
-    make test
+  - ```shell
+    ./configure  --build=x86_64-linux-gnu --host=arm-linux-androideabi --disable-ipv6 CONFIG_SITE=config.site --prefix=/system/
+    ```
 
-(This will fail if you *also* built at the top-level directory.
-You should do a "make clean" at the toplevel first.)
+  - 由于android5.0之后开启了pie验证，因此需要对Makefile修改
 
-If you need an optimized version of Python, you type "make profile-opt" in the
-top level directory. This will rebuild the interpreter executable using Profile
-Guided Optimization (PGO). For more details, see the section bellow.
+    ```shell
+    CC  =	arm-linux-androideabi-gcc -fPIE -pie
+    CXX =	arm-linux-androideabi-g++ -fPIE -pie
+    ```
 
+  - 添加locale支持
 
-Profile Guided Optimization
----------------------------
+    ```shell
+    LIBS =  -ld -llocale
+    ```
 
-PGO takes advantage of recent versions of the GCC or Clang compilers.
-If ran, the "profile-opt" rule will do several steps.
+  - make.
 
-First, the entire Python directory is cleaned of temporary files that
-may resulted in a previous compilation.
+  - make后是会出错的，根据错误拷贝PC版本的pgen与_freeze_importlib到相应的文件夹下。他们分别位于Parser与Programs，最好touch一遍以修改创建时间，
 
-Then, an instrumented version of the interpreter is built, using suitable
-compiler flags for each flavour. Note that this is just an intermediary
-step and the binary resulted after this step is not good for real life
-workloads, as it has profiling instructions embedded inside.
+  - make install DESTDIR=/path/to/you/like
 
-After this instrumented version of the interpreter is built, the Makefile
-will automatically run a training workload. This is necessary in order to
-profile the interpreter execution. Note also that any output, both stdout
-and stderr, that may appear at this step is supressed.
+####3.编译后
 
-Finally, the last step is to rebuild the interpreter, using the information
-collected in the previous one. The end result will be a the Python binary
-that is optimized and suitable for distribution or production installation.
+编译成功后把system目录下相应的文件夹push到安卓目录下的对应目录。在push之前由于生成的库以及可执行文件体积庞大，因此需要strip一下以及删除部分lib。
 
+使用arm-linux-androideabi-strip减小python3.5m与python3.5体积，效果非常明显。
 
-What's New
-----------
-
-We have a comprehensive overview of the changes in the "What's New in
-Python 3.5" document, found at
-
-    http://docs.python.org/3.5/whatsnew/3.5.html
-
-For a more detailed change log, read Misc/NEWS (though this file, too,
-is incomplete, and also doesn't list anything merged in from the 2.7
-release under development).
-
-If you want to install multiple versions of Python see the section below
-entitled "Installing multiple versions".
-
-
-Documentation
--------------
-
-Documentation for Python 3.5 is online, updated daily:
-
-    http://docs.python.org/3.5/
-
-It can also be downloaded in many formats for faster access.  The documentation
-is downloadable in HTML, PDF, and reStructuredText formats; the latter version
-is primarily for documentation authors, translators, and people with special
-formatting requirements.
-
-If you would like to contribute to the development of Python, relevant
-documentation is available at:
-
-    http://docs.python.org/devguide/
-
-For information about building Python's documentation, refer to Doc/README.txt.
-
-
-Converting From Python 2.x to 3.x
----------------------------------
-
-Python starting with 2.6 contains features to help locating code that needs to
-be changed, such as optional warnings when deprecated features are used, and
-backported versions of certain key Python 3.x features.
-
-A source-to-source translation tool, "2to3", can take care of the mundane task
-of converting large amounts of source code.  It is not a complete solution but
-is complemented by the deprecation warnings in 2.6.  See
-http://docs.python.org/3.5/library/2to3.html for more information.
-
-
-Testing
--------
-
-To test the interpreter, type "make test" in the top-level directory.
-The test set produces some output.  You can generally ignore the messages
-about skipped tests due to optional features which can't be imported.
-If a message is printed about a failed test or a traceback or core dump
-is produced, something is wrong.
-
-By default, tests are prevented from overusing resources like disk space and
-memory.  To enable these tests, run "make testall".
-
-IMPORTANT: If the tests fail and you decide to mail a bug report, *don't*
-include the output of "make test".  It is useless.  Run the failing test
-manually, as follows:
-
-        ./python -m test -v test_whatever
-
-(substituting the top of the source tree for '.' if you built in a different
-directory).  This runs the test in verbose mode.
-
-
-Installing multiple versions
-----------------------------
-
-On Unix and Mac systems if you intend to install multiple versions of Python
-using the same installation prefix (--prefix argument to the configure script)
-you must take care that your primary python executable is not overwritten by
-the installation of a different version.  All files and directories installed
-using "make altinstall" contain the major and minor version and can thus live
-side-by-side.  "make install" also creates ${prefix}/bin/python3 which refers
-to ${prefix}/bin/pythonX.Y.  If you intend to install multiple versions using
-the same prefix you must decide which version (if any) is your "primary"
-version.  Install that version using "make install".  Install all other
-versions using "make altinstall".
-
-For example, if you want to install Python 2.6, 2.7 and 3.5 with 2.7 being the
-primary version, you would execute "make install" in your 2.7 build directory
-and "make altinstall" in the others.
-
-
-Issue Tracker and Mailing List
-------------------------------
-
-We're soliciting bug reports about all aspects of the language.  Fixes are also
-welcome, preferably in unified diff format.  Please use the issue tracker:
-
-    http://bugs.python.org/
-
-If you're not sure whether you're dealing with a bug or a feature, use the
-mailing list:
-
-    python-dev@python.org
-
-To subscribe to the list, use the mailman form:
-
-    http://mail.python.org/mailman/listinfo/python-dev/
-
-Proposals for enhancement
--------------------------
-
-If you have a proposal to change Python, you may want to send an email to the
-comp.lang.python or python-ideas mailing lists for inital feedback.  A Python
-Enhancement Proposal (PEP) may be submitted if your idea gains ground.  All
-current PEPs, as well as guidelines for submitting a new PEP, are listed at
-http://www.python.org/dev/peps/.
-
-
-Release Schedule
-----------------
-
-See PEP 478 for release details: http://www.python.org/dev/peps/pep-0478/
-
-
-Copyright and License Information
----------------------------------
-
-Copyright (c) 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011,
-2012, 2013, 2014, 2015 Python Software Foundation.  All rights reserved.
-
-Copyright (c) 2000 BeOpen.com.  All rights reserved.
-
-Copyright (c) 1995-2001 Corporation for National Research Initiatives.  All
-rights reserved.
-
-Copyright (c) 1991-1995 Stichting Mathematisch Centrum.  All rights reserved.
-
-See the file "LICENSE" for information on the history of this software,
-terms & conditions for usage, and a DISCLAIMER OF ALL WARRANTIES.
-
-This Python distribution contains *no* GNU General Public License (GPL) code,
-so it may be used in proprietary projects.  There are interfaces to some GNU
-code but these are entirely optional.
-
-All trademarks referenced herein are property of their respective holders.
+删除生成的静态库。
