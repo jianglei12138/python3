@@ -923,7 +923,7 @@ initfsencoding(PyInterpreterState *interp)
 
     if (Py_FileSystemDefaultEncoding == NULL)
     {
-        Py_FileSystemDefaultEncoding = get_locale_encoding();
+        Py_FileSystemDefaultEncoding = "utf-8";//get_locale_encoding();
         if (Py_FileSystemDefaultEncoding == NULL)
             Py_FatalError("Py_Initialize: Unable to get the locale encoding");
 

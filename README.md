@@ -1,18 +1,32 @@
-This is Python version 3.5.1
-============================
+## Python for android
 
-Copyright (c) 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011,
-2012, 2013, 2014, 2015 Python Software Foundation.  All rights reserved.
+本项目基于python的当前最新版本3.5.1。具体的编译步骤如下：
 
-Python 3.x is a new version of the language, which is incompatible with the
-2.x line of releases.  The language is mostly the same, but many details,
-especially how built-in objects like dictionaries and strings work,
-have changed considerably, and a lot of deprecated features have finally
-been removed.
+#### 1.编译前准备
 
+- 使用NDK导出的交叉编译工具链。
 
-Build Instructions
-------------------
+- 安卓默认不支持nl_langinfo方法(可以使用安卓NDK中的support)，因此python无法获取正确的编码。安卓默认使用utf-8，可以直接修改为UTF－8，具体位置Python/pylifecycle.c
+
+  ```c
+  Py_FileSystemDefaultEncoding = get_locale_encoding();
+  ```
+
+  改为
+
+  ```c
+  Py_FileSystemDefaultEncoding = "utf-8";//get_locale_encoding();
+  ```
+
+  工程已经改好。
+
+- 我使用的是ubuntu15.10 64位操作系统。
+
+#### 2.编译过程
+
+- ```shell
+  ./configure  --build=x86_64-linux-gnu --host=arm-linux-androideabi --disable-ipv6 CONFIG_SITE=config.site --prefix=/system/
+  ```
 
 On Unix, Linux, BSD, OSX, and Cygwin:
 
@@ -181,7 +195,6 @@ mailing list:
 To subscribe to the list, use the mailman form:
 
     http://mail.python.org/mailman/listinfo/python-dev/
-
 
 Proposals for enhancement
 -------------------------
