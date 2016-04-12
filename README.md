@@ -73,8 +73,24 @@
 
 ####3.编译后
 
-编译成功后把system目录下相应的文件夹push到安卓目录下的对应目录。在push之前由于生成的库以及可执行文件体积庞大，因此需要strip一下以及删除部分lib。
+- 编译成功后把system目录下相应的文件夹push到安卓目录下的对应目录。在push之前由于生成的库以及可执行文件体积庞大，因此需要strip一下以及删除部分lib。
 
-使用arm-linux-androideabi-strip减小python3.5m与python3.5体积，效果非常明显。
 
-删除生成的静态库。
+- 使用arm-linux-androideabi-strip减小python3.5m与python3.5体积，效果非常明显。
+
+
+- 删除生成的静态库。
+
+
+- 可以压缩标准库，然后在使用时指定PYTHONPATH添加相应的python35.zip目录，甚至可以设置成在sdcard中，但仅限压缩后，不压缩不因为android的系统限制不能加载动态库。
+
+####4.测试
+
+- 设置PYTHONPATH
+
+  ![path](art/path.png)
+
+
+- 支持的modules
+
+  ![modules](art/modules.png)
