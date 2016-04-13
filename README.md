@@ -58,6 +58,8 @@
     CC  =	arm-linux-androideabi-gcc -fPIE -pie
     CXX =	arm-linux-androideabi-g++ -fPIE -pie
     ```
+    
+  - 可以修改modules文件夹下的Setup修改标准库的支持
 
   - 添加locale支持
 
