@@ -6,7 +6,7 @@
 
 - 使用NDK导出的交叉编译工具链。
 
-- 安卓默认不支持nl_langinfo方法(可以使用安卓NDK中的support)，因此python无法获取正确的编码。安卓默认使用utf-8，可以直接修改为UTF－8，具体位置Python/pylifecycle.c
+- 安卓默认不支持nl_langinfo方法(可以使用安卓NDK中的support,可以直接编译出动态库后使用)，因此python无法获取正确的编码。安卓默认使用utf-8，可以直接修改为UTF－8，具体位置Python/pylifecycle.c
 
   ```c
   Py_FileSystemDefaultEncoding = get_locale_encoding();
@@ -84,7 +84,7 @@
 - 删除生成的静态库。
 
 
-- 可以压缩标准库，然后在使用时指定PYTHONPATH添加相应的python35.zip目录，甚至可以设置成在sdcard中，但仅限压缩后，不压缩不因为android的系统限制不能加载动态库。
+- 可以压缩标准库，然后在使用时指定PYTHONPATH添加相应的python35.zip目录，甚至可以设置成在sdcard中，但仅限压缩后，不压缩不能用是因为android的系统限制不能从SDCARD 中加载动态库。
 
 ####4.测试
 
