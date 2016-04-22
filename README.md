@@ -1,96 +1,67 @@
 ## Python for android
 
-本项目基于python的当前最新版本3.5.1。具体的编译步骤如下：
+This project is based on the version 3.5.1 of python. I have made some changes to the source code The specific steps for compile are as follows:
 
-#### 1.编译前准备
+#### 1.Preparation
 
-- 使用NDK导出的交叉编译工具链。
+- cross compiler toolchain was exported by ndk.
 
-- 安卓默认不支持nl_langinfo方法(可以使用安卓NDK中的support)，因此python无法获取正确的编码。安卓默认使用utf-8，可以直接修改为UTF－8，具体位置Python/pylifecycle.c
+- ubuntu15.10 x64。
 
-  ```c
-  Py_FileSystemDefaultEncoding = get_locale_encoding();
-  ```
+- bionic does not localeconv(), you should copy the locale header and shared library to the toolchain sysroot/usr/include and sysroot/usr/lib. 
 
-  改为
 
-  ```c
-  Py_FileSystemDefaultEncoding = "utf-8";//get_locale_encoding();
-  ```
+#### 2.Compile
 
-  工程已经改好。
+We shoud compile the source code under pc and android, because we need the executables pgen and _freeze_importlib which compile under PC.
 
-- 我使用的是ubuntu15.10 64位操作系统。
-
-- 由于bionic不支持localeconv(), 可以使用我仓库里的liblocale库。
-
-- Android struct passwd不包含pw_gecos, 修改Module/pwdmodule.c中的
-
-  ```c
-  SETS(setIndex++, p->pw_gecos);
-  ```
-
-  改为
-
-  ```c
-  SETS(setIndex++, p->pw_name);
-  ```
-
-#### 2.编译过程
-
-编译需要分别编译pc版与android版，因为需要pc版的生成的语法解析器pgen与_freeze_importlib
-
-- pc版编译
+- pc
 
   ```shell
   ./configure && make
   ```
 
-- android版编译
+- cross compile
 
   - ```shell
     ./configure  --build=x86_64-linux-gnu --host=arm-linux-androideabi --disable-ipv6 CONFIG_SITE=config.site --prefix=/system/
     ```
 
-  - 由于android5.0之后开启了pie验证，因此需要对Makefile修改
-
-    ```shell
-    CC  =	arm-linux-androideabi-gcc -fPIE -pie
-    CXX =	arm-linux-androideabi-g++ -fPIE -pie
-    ```
-
-  - 添加locale支持
-
-    ```shell
-    LIBS =  -ld -llocale
-    ```
-
   - make.
 
-  - make后是会出错的，根据错误拷贝PC版本的pgen与_freeze_importlib到相应的文件夹下。他们分别位于Parser与Programs，最好touch一遍以修改创建时间，
+  - The you'll get errors，According to the errors, you may need to copy the executable pgen or _freeze_importlib which compile under PC to the right folder , and they under folder Parser or Programs. Do not forget to modifiy the time of each file. 
+
+    ```shell
+    touch ./Parser/pgen 
+    #Or
+    touch ./Programs/_freeze_importlib
+    ```
+
+    The continue compiling.
 
   - make install DESTDIR=/path/to/you/like
 
-####3.编译后
+####3.Compiled
 
-- 编译成功后把system目录下相应的文件夹push到安卓目录下的对应目录。在push之前由于生成的库以及可执行文件体积庞大，因此需要strip一下以及删除部分lib。
+- Once compiled successfully，you can reduce the volume of executable use strip command. Like this:
 
-
-- 使用arm-linux-androideabi-strip减小python3.5m与python3.5体积，效果非常明显。
-
-
-- 删除生成的静态库。
+  ```shell
+  arm-linux-androideabi-strip python3.5
+  ```
 
 
-- 可以压缩标准库，然后在使用时指定PYTHONPATH添加相应的python35.zip目录，甚至可以设置成在sdcard中，但仅限压缩后，不压缩不因为android的系统限制不能加载动态库。
+- Delete the static library if you don't need it.
 
-####4.测试
 
-- 设置PYTHONPATH
+- You can compress the standard library which under the directory of lib (use zip), and then put the compressed zip(python35.zip) file in the right place(may be under /system/lib/python3.5/). Or just put the zip to sdcard  and export the PYTHONPATH when used. If you doesn't compress the library, put the library folder under /system/lib/. You shouldn't put the uncompressed library to sdcard because android doesn't support load shared library from sdcard. But you can push the compressed library to sdcard. 
+
+####4.Test
+
+- if you use the library was compressed, you may need to set PYTHONPATH for python.
 
   ![path](art/path.png)
 
 
-- 支持的modules
+- supported modules
 
   ![modules](art/modules.png)
