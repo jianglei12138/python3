@@ -54,11 +54,10 @@ We shoud compile the source code under pc and android, because we need the execu
   arm-linux-androideabi-strip python3.5
   ```
 
-
 - Delete the static library if you don't need it.
 
-
 - You can compress the standard library which under the directory of lib/python3.5 (use zip), and then put the compressed zip(python35.zip) file in the right place(may be under /system/lib/python3.5/). Or just put the zip to sdcard  and export the PYTHONPATH when used. If you doesn't compress the library, put the library folder under /system/lib/. You shouldn't put the uncompressed library to sdcard because android doesn't support load shared library from sdcard. But you can push the compressed library to sdcard. 
+
 ####4.Test
 
 - if you use the library was compressed, you may need to set PYTHONPATH for python.
