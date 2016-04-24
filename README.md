@@ -7,26 +7,29 @@ This project is based on the version 3.5.1 of python. I have made some changes t
 - cross compiler toolchain was exported by ndk.
 
 
-- ubuntu15.10 x64。
+- ubuntu15.10 x64.
 
 - bionic does not localeconv(), you should copy the locale header and shared library to the toolchain sysroot/usr/include and sysroot/usr/lib. 
 
 
 #### 2.Compile
 
-We shoud compile the source code under pc and android, because we need the executables pgen and _freeze_importlib which compile under PC.
+We shoud compile the source code under pc and android, because we need the executables pgen and _freeze_importlib which compile under PC. Unfortunately, i modify some source code, so this project could not be compiled for PC. 
 
-- pc
+- build pc.
+
+  get the source code from https://www.python.org/downloads/release/python-351/, then build 
 
   ```shell
   ./configure && make
   ```
+  Or use the prebuilt executables, pgen and _freeze_importlib.
 
 - cross compile
 
-  - ```shell
-    ./configure  --build=x86_64-linux-gnu --host=arm-linux-androideabi --disable-ipv6 CONFIG_SITE=config.site --prefix=/system/
-    ```
+  ```shell
+  ./configure  --build=x86_64-linux-gnu --host=arm-linux-androideabi --disable-ipv6 CONFIG_SITE=config.site --prefix=/system/
+  ```
 
 - Modify the Setup file under folder Modules to specify the modules should be compiled.
 
