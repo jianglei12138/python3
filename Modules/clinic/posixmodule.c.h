@@ -2,6 +2,8 @@
 preserve
 [clinic start generated code]*/
 
+typedef int idtype_t;
+
 PyDoc_STRVAR(os_stat__doc__,
 "stat($module, /, path, *, dir_fd=None, follow_symlinks=True)\n"
 "--\n"

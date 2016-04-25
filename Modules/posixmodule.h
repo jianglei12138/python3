@@ -2,6 +2,9 @@
 
 #ifndef Py_POSIXMODULE_H
 #define Py_POSIXMODULE_H
+
+typedef int idtype_t;
+
 #ifdef __cplusplus
 extern "C" {
 #endif
