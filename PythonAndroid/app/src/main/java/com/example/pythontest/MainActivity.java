@@ -20,9 +20,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     static {
         System.loadLibrary("locale");
-        System.loadLibrary("history");
-        System.loadLibrary("termcap");
-        System.loadLibrary("readline");
+        System.loadLibrary("python3.5");
         System.loadLibrary("main");
     }
 

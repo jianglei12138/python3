@@ -2,7 +2,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include "python3.5m/Python.h"
+#include "Python.h"
 #include <android/log.h>
 
 JNIEXPORT jint JNICALL Java_com_example_pythontest_MainActivity_add
@@ -10,7 +10,7 @@ JNIEXPORT jint JNICALL Java_com_example_pythontest_MainActivity_add
 {
     //set path and home,pay attention --> python3.5.zip
 	putenv("PYTHONPATH=/data/data/com.example.pythontest/files/python3.5.zip");
-	putenv("PYTHONHOME=/data/data/com.example.pythontest/files");
+	//putenv("PYTHONHOME=/data/data/com.example.pythontest/files");
 
 
     Py_Initialize();
@@ -19,7 +19,8 @@ JNIEXPORT jint JNICALL Java_com_example_pythontest_MainActivity_add
         return -1;
     }
 
-    
+    __android_log_print(ANDROID_LOG_INFO, "JNIEnv","Py_Initialize successfully!!\n");
+
     //add current path to search pythonforandroid.py file
     PyRun_SimpleString("import sys");
     PyRun_SimpleString("sys.path.append('/data/data/com.example.pythontest/files')"); //this mean pythonforandroid.py under /data/data/com.example.pythontest/files
@@ -28,7 +29,6 @@ JNIEXPORT jint JNICALL Java_com_example_pythontest_MainActivity_add
     PyObject *pFunction;
     PyObject *pArgs;
     PyObject *pRetValue;
-
 
     //import module which name pythonforandroid under /data/data/com.example.pythontest/files
     pModule = PyImport_ImportModule("pythonforandroid");
