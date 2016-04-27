@@ -163,7 +163,7 @@ _symtable symtablemodule.c
 # it, depending on your system -- see the GNU readline instructions.
 # It's okay for this to be a shared library, too.
 
-readline readline.c -lreadline -ltermcap
+#readline readline.c -lreadline -ltermcap
 
 
 # Modules that should always be present (non UNIX dependent):
@@ -172,16 +172,16 @@ array arraymodule.c	# array objects
 cmath cmathmodule.c _math.c # -lm # complex math library functions
 math mathmodule.c _math.c # -lm # math library functions, e.g. sin()
 _struct _struct.c	# binary structure packing/unpacking
-#_weakref _weakref.c	# basic weak reference support
+_weakref _weakref.c	# basic weak reference support
 #_testcapi _testcapimodule.c    # Python C API test module
 _random _randommodule.c	# Random number generator
 _elementtree -I$(srcdir)/Modules/expat -DHAVE_EXPAT_CONFIG_H -DUSE_PYEXPAT_CAPI _elementtree.c	# elementtree accelerator
-#_pickle _pickle.c	# pickle accelerator
+_pickle _pickle.c	# pickle accelerator
 _datetime _datetimemodule.c	# datetime accelerator
 _bisect _bisectmodule.c	# Bisection algorithms
 _heapq _heapqmodule.c	# Heap queue algorithm
 
-#unicodedata unicodedata.c    # static Unicode character database
+unicodedata unicodedata.c    # static Unicode character database
 
 
 # Modules with some UNIX dependencies -- on by default:
@@ -200,14 +200,12 @@ mmap mmapmodule.c
 _csv _csv.c
 
 # Socket module helper for socket(2)
-#_socket socketmodule.c
+_socket socketmodule.c
 
 # Socket module helper for SSL support; you must comment out the other
 # socket line above, and possibly edit the SSL variable:
 #SSL=/usr/local/ssl
-#_ssl _ssl.c \
-#	-DUSE_SSL -I$(SSL)/include -I$(SSL)/include/openssl \
-#	-L$(SSL)/lib -lssl -lcrypto
+_ssl _ssl.c -DUSE_SSL -lssl -lcrypto
 
 # The crypt module is now disabled by default because it breaks builds
 # on many systems (where -lcrypt is needed), e.g. Linux (I believe).
@@ -376,14 +374,14 @@ pyexpat expat/xmlparse.c expat/xmlrole.c expat/xmltok.c pyexpat.c -I$(srcdir)/Mo
 # Hye-Shik Chang's CJKCodecs
 
 # multibytecodec is required for all the other CJK codec modules
-#_multibytecodec cjkcodecs/multibytecodec.c
+_multibytecodec cjkcodecs/multibytecodec.c
 
-#_codecs_cn cjkcodecs/_codecs_cn.c
-#_codecs_hk cjkcodecs/_codecs_hk.c
-#_codecs_iso2022 cjkcodecs/_codecs_iso2022.c
-#_codecs_jp cjkcodecs/_codecs_jp.c
-#_codecs_kr cjkcodecs/_codecs_kr.c
-#_codecs_tw cjkcodecs/_codecs_tw.c
+_codecs_cn cjkcodecs/_codecs_cn.c
+_codecs_hk cjkcodecs/_codecs_hk.c
+_codecs_iso2022 cjkcodecs/_codecs_iso2022.c
+_codecs_jp cjkcodecs/_codecs_jp.c
+_codecs_kr cjkcodecs/_codecs_kr.c
+_codecs_tw cjkcodecs/_codecs_tw.c
 
 # Example -- included for reference only:
 # xx xxmodule.c

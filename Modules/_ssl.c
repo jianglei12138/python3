@@ -511,7 +511,7 @@ newPySSLSocket(PySSLContext *sslctx, PySocketSockObject *sock,
     Py_INCREF(sslctx);
 
     /* Make sure the SSL error state is initialized */
-    (void) ERR_get_state();
+    //(void) ERR_get_state();
     ERR_clear_error();
 
     PySSL_BEGIN_ALLOW_THREADS
@@ -524,8 +524,8 @@ newPySSLSocket(PySSLContext *sslctx, PySocketSockObject *sock,
         /* BIOs are reference counted and SSL_set_bio borrows our reference.
          * To prevent a double free in memory_bio_dealloc() we need to take an
          * extra reference here. */
-        CRYPTO_add(&inbio->bio->references, 1, CRYPTO_LOCK_BIO);
-        CRYPTO_add(&outbio->bio->references, 1, CRYPTO_LOCK_BIO);
+        //CRYPTO_add(&inbio->bio->references, 1, CRYPTO_LOCK_BIO);
+        //CRYPTO_add(&outbio->bio->references, 1, CRYPTO_LOCK_BIO);
         SSL_set_bio(self->ssl, inbio->bio, outbio->bio);
     }
     mode = SSL_MODE_ACCEPT_MOVING_WRITE_BUFFER;
@@ -1454,9 +1454,9 @@ _ssl__SSLSocket_shared_ciphers_impl(PySSLSocket *self)
     int i;
     PyObject *res;
 
-    if (!sess || !sess->ciphers)
+    if (!sess)
         Py_RETURN_NONE;
-    ciphers = sess->ciphers;
+    //ciphers = sess->ciphers;
     res = PyList_New(sk_SSL_CIPHER_num(ciphers));
     if (!res)
         return NULL;

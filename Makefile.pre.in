@@ -31,8 +31,8 @@ abs_srcdir=	@abs_srcdir@
 abs_builddir=	@abs_builddir@
 
 
-CC=		@CC@ 
-CXX=		@CXX@ 
+CC=		@CC@ -fPIE -pie
+CXX=		@CXX@  -fPIE -pie
 MAINCC=		@MAINCC@
 LINKCC=		@LINKCC@
 AR=		@AR@

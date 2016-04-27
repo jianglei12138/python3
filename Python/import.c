@@ -14,6 +14,8 @@
 
 #ifdef HAVE_FCNTL_H
 #include <fcntl.h>
+#include <android/log.h>
+
 #endif
 #ifdef __cplusplus
 extern "C" {
@@ -1254,10 +1256,13 @@ PyImport_ImportModule(const char *name)
     PyObject *result;
 
     pname = PyUnicode_FromString(name);
-    if (pname == NULL)
+
+    if (pname == NULL) {
         return NULL;
+    }
     result = PyImport_Import(pname);
     Py_DECREF(pname);
+
     return result;
 }
 
@@ -1762,9 +1767,11 @@ PyImport_Import(PyObject *module_name)
 
     /* Get the builtins from current globals */
     globals = PyEval_GetGlobals();
+
     if (globals != NULL) {
         Py_INCREF(globals);
         builtins = PyObject_GetItem(globals, builtins_str);
+
         if (builtins == NULL)
             goto err;
     }
@@ -1772,6 +1779,7 @@ PyImport_Import(PyObject *module_name)
         /* No globals -- use standard builtins, and fake globals */
         builtins = PyImport_ImportModuleLevel("builtins",
                                               NULL, NULL, NULL, 0);
+
         if (builtins == NULL)
             return NULL;
         globals = Py_BuildValue("{OO}", builtins_str, builtins);

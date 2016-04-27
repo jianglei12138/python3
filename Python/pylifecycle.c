@@ -43,6 +43,8 @@ _Py_IDENTIFIER(stderr);
 extern "C" {
 #endif
 
+#include "android/log.h"
+
 extern wchar_t *Py_GetPath(void);
 
 extern grammar _PyParser_Grammar; /* From graminit.c */
@@ -658,12 +660,15 @@ Py_Finalize(void)
 
     /* Cleanup Unicode implementation */
     _PyUnicode_Fini();
+    __android_log_print(ANDROID_LOG_ERROR, "Py_FatalError","_PyUnicode_Fini");
 
     /* reset file system default encoding */
-    if (!Py_HasFileSystemDefaultEncoding && Py_FileSystemDefaultEncoding) {
-        PyMem_RawFree((char*)Py_FileSystemDefaultEncoding);
-        Py_FileSystemDefaultEncoding = NULL;
-    }
+//    if (!Py_HasFileSystemDefaultEncoding && Py_FileSystemDefaultEncoding) {
+//        PyMem_RawFree((char*)Py_FileSystemDefaultEncoding);
+//        Py_FileSystemDefaultEncoding = NULL;
+//    }
+    __android_log_print(ANDROID_LOG_ERROR, "Py_FatalError","PyMem_RawFree");
+
 
     /* XXX Still allocated:
        - various static ad-hoc pointers to interned strings
@@ -687,6 +692,8 @@ Py_Finalize(void)
      * An address can be used to find the repr of the object, printed
      * above by _Py_PrintReferences.
      */
+    __android_log_print(ANDROID_LOG_ERROR, "Py_FatalError","_Py_PrintReferenceAddresses");
+
     if (Py_GETENV("PYTHONDUMPREFS"))
         _Py_PrintReferenceAddresses(stderr);
 #endif /* Py_TRACE_REFS */
@@ -694,6 +701,7 @@ Py_Finalize(void)
     if (Py_GETENV("PYTHONMALLOCSTATS"))
         _PyObject_DebugMallocStats(stderr);
 #endif
+    __android_log_print(ANDROID_LOG_ERROR, "Py_FatalError","call_ll_exitfuncs");
 
     call_ll_exitfuncs();
 }
@@ -923,7 +931,7 @@ initfsencoding(PyInterpreterState *interp)
 
     if (Py_FileSystemDefaultEncoding == NULL)
     {
-        Py_FileSystemDefaultEncoding = get_locale_encoding();
+        Py_FileSystemDefaultEncoding = "utf-8";
         if (Py_FileSystemDefaultEncoding == NULL)
             Py_FatalError("Py_Initialize: Unable to get the locale encoding");
 
@@ -1105,6 +1113,7 @@ initstdio(void)
     /* Hack to avoid a nasty recursion issue when Python is invoked
        in verbose mode: pre-import the Latin-1 and UTF-8 codecs */
     if ((m = PyImport_ImportModule("encodings.utf_8")) == NULL) {
+        __android_log_print(ANDROID_LOG_ERROR,"Py_FatalError","init stdio failed!");
         goto error;
     }
     Py_DECREF(m);
@@ -1316,6 +1325,7 @@ display_stack:
 }
 /* Print fatal error message and abort */
 
+
 void
 Py_FatalError(const char *msg)
 {
@@ -1335,6 +1345,8 @@ Py_FatalError(const char *msg)
     reentrant = 1;
 
     fprintf(stderr, "Fatal Python error: %s\n", msg);
+    __android_log_print(ANDROID_LOG_ERROR, "Py_FatalError","Fatal Python error: %s\n", msg); 
+
     fflush(stderr); /* it helps in Windows debug build */
 
     /* Print the exception (if an exception is set) with its traceback,

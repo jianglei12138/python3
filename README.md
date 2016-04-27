@@ -9,7 +9,7 @@ This project is based on the version 3.5.1 of python. I have made some changes t
 
 - ubuntu15.10 x64.
 
-- bionic does not localeconv(), you should copy the locale header and shared library to the toolchain sysroot/usr/include and sysroot/usr/lib. 
+- python library need lots of dynamic libraries. And these libraries under folder of Libraries. Before comile, put the header and library to path/to/toolchain/sysroot/usr/include and path/to/toolchain/sysroot/usr/lib.
 
 
 #### 2.Compile
