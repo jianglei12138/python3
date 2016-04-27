@@ -102,8 +102,6 @@ static unsigned long gil_interval = DEFAULT_INTERVAL;
             timeout_result = 0; \
     } \
 
-
-
 /* Whether the GIL is already taken (-1 if uninitialized). This is atomic
    because it can be read without any lock taken in ceval.c. */
 static _Py_atomic_int gil_locked = {-1};
