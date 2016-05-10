@@ -5,6 +5,7 @@
 #include "structmember.h" /* we need the offsetof() macro from there */
 #include "longintrepr.h"
 
+#include <android/log.h>
 
 
 /* Shorthands to return certain errors */
@@ -2174,12 +2175,14 @@ call_function_tail(PyObject *callable, PyObject *args)
 {
     PyObject *retval;
 
-    if (args == NULL)
+    if (args == NULL){
+        __android_log_print(ANDROID_LOG_ERROR,"JNIEnv","call_function_tail args");
         return NULL;
+    }
 
     if (!PyTuple_Check(args)) {
         PyObject *a;
-
+        __android_log_print(ANDROID_LOG_ERROR,"JNIEnv","PyTuple_Check args");
         a = PyTuple_New(1);
         if (a == NULL) {
             Py_DECREF(args);
@@ -2200,19 +2203,27 @@ PyObject_CallFunction(PyObject *callable, const char *format, ...)
 {
     va_list va;
     PyObject *args;
+    __android_log_print(ANDROID_LOG_ERROR,"JNIEnv","PyObject_CallFunction");
 
-    if (callable == NULL)
+    if (callable == NULL){
+        __android_log_print(ANDROID_LOG_ERROR,"JNIEnv","callable == NULL");
         return null_error();
+    }
 
     if (format && *format) {
+        __android_log_print(ANDROID_LOG_ERROR,"JNIEnv","format");
         va_start(va, format);
         args = Py_VaBuildValue(format, va);
         va_end(va);
     }
-    else
+    else{
+        __android_log_print(ANDROID_LOG_ERROR,"JNIEnv","format else");
         args = PyTuple_New(0);
-    if (args == NULL)
+    }
+    if (args == NULL){
+        __android_log_print(ANDROID_LOG_ERROR,"JNIEnv","args == null");
         return NULL;
+    }
 
     return call_function_tail(callable, args);
 }

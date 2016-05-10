@@ -198,6 +198,7 @@ do_mktuple(const char **p_format, va_list *p_va, int endchar, int n, int flags)
 static PyObject *
 do_mkvalue(const char **p_format, va_list *p_va, int flags)
 {
+    
     for (;;) {
         switch (*(*p_format)++) {
         case '(':

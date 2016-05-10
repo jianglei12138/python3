@@ -68,3 +68,7 @@ We shoud compile the source code under pc and android, because we need the execu
 - supported modules
 
   ![modules](art/modules.png)
+
+####5.Attention
+
+This could use in adb shell, but not in an android app, I still working on it!

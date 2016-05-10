@@ -11,6 +11,7 @@
 #include "frameobject.h"
 #include "osdefs.h"
 #include "importdl.h"
+#include <android/log.h>
 
 #ifdef HAVE_FCNTL_H
 #include <fcntl.h>
@@ -1258,8 +1259,11 @@ PyImport_ImportModule(const char *name)
     pname = PyUnicode_FromString(name);
 
     if (pname == NULL) {
+        __android_log_print(ANDROID_LOG_ERROR,"JNIEnv","pname is null");
         return NULL;
     }
+    
+    __android_log_print(ANDROID_LOG_ERROR,"JNIEnv","go PyImport_Import");
     result = PyImport_Import(pname);
     Py_DECREF(pname);
 
@@ -1754,15 +1758,23 @@ PyImport_Import(PyObject *module_name)
 
     /* Initialize constant string objects */
     if (silly_list == NULL) {
+        __android_log_print(ANDROID_LOG_ERROR,"JNIEnv","silly_list null");
         import_str = PyUnicode_InternFromString("__import__");
-        if (import_str == NULL)
+        if (import_str == NULL){
+            __android_log_print(ANDROID_LOG_ERROR,"JNIEnv","import_str null");
             return NULL;
+        }
         builtins_str = PyUnicode_InternFromString("__builtins__");
-        if (builtins_str == NULL)
+        if (builtins_str == NULL){
+            __android_log_print(ANDROID_LOG_ERROR,"JNIEnv","builtins_str null");
             return NULL;
+        }
         silly_list = PyList_New(0);
-        if (silly_list == NULL)
+        if (silly_list == NULL){
+            __android_log_print(ANDROID_LOG_ERROR,"JNIEnv","repeat silly_list null");
+
             return NULL;
+        }
     }
 
     /* Get the builtins from current globals */
@@ -1801,10 +1813,13 @@ PyImport_Import(PyObject *module_name)
     /* Call the __import__ function with the proper argument list
        Always use absolute import here.
        Calling for side-effect of import. */
+     __android_log_print(ANDROID_LOG_ERROR,"JNIEnv","PyObject_CallFunction = module_name%s", PyUnicode_AsUTF8(module_name));
     r = PyObject_CallFunction(import, "OOOOi", module_name, globals,
                               globals, silly_list, 0, NULL);
-    if (r == NULL)
+    if (r == NULL){
+        __android_log_print(ANDROID_LOG_ERROR,"JNIEnv","PyObject_CallFunction null");
         goto err;
+    }
     Py_DECREF(r);
 
     modules = PyImport_GetModuleDict();
